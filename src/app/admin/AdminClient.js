@@ -34,15 +34,23 @@ export default function AdminClient({ orders, clients, messages }) {
     };
 
     const updateOrderStatus = async (orderId, newStatus) => {
-        const { error } = await supabase
-            .from('orders')
-            .update({ status: newStatus, updated_at: new Date().toISOString() })
-            .eq('id', orderId);
+        try {
+            const res = await fetch('/api/admin/orders', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId, status: newStatus }),
+            });
 
-        if (!error) {
-            setLocalOrders(prev =>
-                prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o)
-            );
+            if (res.ok) {
+                setLocalOrders(prev =>
+                    prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o)
+                );
+                if (newStatus === 'done' || newStatus === 'delivered') {
+                    alert('📧 Email de notification envoyé au client !');
+                }
+            }
+        } catch (err) {
+            console.error('Status update failed:', err);
         }
     };
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase-server';
 import { sanitizeText, isValidEmail, verifyOrigin, rateLimit, getClientIP } from '@/lib/security';
+import { sendQuoteConfirmation } from '@/lib/email';
 
 export async function POST(request) {
     try {
@@ -93,6 +94,14 @@ export async function POST(request) {
             } else {
                 orderCreated = true;
                 console.log('📦 Commande créée pour', user.email, orderData);
+
+                // Send confirmation email (async, don't block response)
+                sendQuoteConfirmation({
+                    to: email,
+                    clientName: name,
+                    subject,
+                    description: message,
+                }).catch(err => console.error('Email failed:', err));
             }
         }
 

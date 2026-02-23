@@ -2,6 +2,7 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ScrollReveal from '@/components/ScrollReveal';
+import CookieBanner from '@/components/CookieBanner';
 
 export const metadata = {
   title: 'Paris Paint Studio — Peinture de Figurines Warhammer à Paris',
@@ -19,7 +20,9 @@ export default function RootLayout({ children }) {
         {children}
         <Footer />
         <ScrollReveal />
+        <CookieBanner />
       </body>
     </html>
   );
 }
+

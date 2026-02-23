@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { createClient } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import '../../app/dashboard.css';
 
@@ -20,13 +21,38 @@ const TIER_LABELS = {
 };
 
 export default function DashboardClient({ user, profile, orders }) {
+    const [payingOrderId, setPayingOrderId] = useState(null);
     const router = useRouter();
+    const searchParams = useSearchParams();
     const supabase = createClient();
+
+    const paymentStatus = searchParams.get('payment');
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
         router.push('/');
         router.refresh();
+    };
+
+    const handlePay = async (orderId) => {
+        setPayingOrderId(orderId);
+        try {
+            const res = await fetch('/api/stripe/create-checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId }),
+            });
+            const data = await res.json();
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                alert(data.error || 'Erreur lors du paiement');
+                setPayingOrderId(null);
+            }
+        } catch {
+            alert('Erreur de connexion');
+            setPayingOrderId(null);
+        }
     };
 
     const formatDate = (dateStr) => {
@@ -54,6 +80,17 @@ export default function DashboardClient({ user, profile, orders }) {
                         </button>
                     </div>
                 </div>
+
+                {paymentStatus === 'success' && (
+                    <div className="login-success" style={{ marginBottom: '24px' }}>
+                        ✅ Paiement réussi ! Votre commande a été acceptée.
+                    </div>
+                )}
+                {paymentStatus === 'cancelled' && (
+                    <div className="login-error" style={{ marginBottom: '24px' }}>
+                        Paiement annulé. Vous pouvez réessayer à tout moment.
+                    </div>
+                )}
 
                 {/* Stats */}
                 <div className="stats-grid">
@@ -120,8 +157,13 @@ export default function DashboardClient({ user, profile, orders }) {
                                             {order.paid ? (
                                                 <span className="paid-badge">✓ Payé</span>
                                             ) : order.total_price ? (
-                                                <button className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '0.65rem' }}>
-                                                    Payer
+                                                <button
+                                                    className="btn btn-primary"
+                                                    style={{ padding: '8px 16px', fontSize: '0.65rem' }}
+                                                    onClick={() => handlePay(order.id)}
+                                                    disabled={payingOrderId === order.id}
+                                                >
+                                                    {payingOrderId === order.id ? 'Redirection...' : 'Payer'}
                                                 </button>
                                             ) : (
                                                 <span className="unpaid-badge">En attente de devis</span>

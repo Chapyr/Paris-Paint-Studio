@@ -8,7 +8,12 @@ export default function Footer() {
                     <Link href="/" className="footer-logo">
                         Paris <span>Paint Studio</span>
                     </Link>
-                    <p className="footer-text">© 2026 Paris Paint Studio · Tous droits réservés</p>
+                    <p className="footer-text">
+                        © 2026 Paris Paint Studio · Tous droits réservés ·{' '}
+                        <Link href="/mentions-legales" style={{ color: 'var(--color-text-muted)' }}>
+                            Mentions légales
+                        </Link>
+                    </p>
                     <div className="footer-social">
                         <a href="#" aria-label="Instagram" title="Instagram">📷</a>
                         <a href="#" aria-label="Facebook" title="Facebook">📘</a>

@@ -71,9 +71,11 @@ export async function POST(request) {
 
         // ── Auto-create order if user is authenticated ──
         let orderCreated = false;
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        console.log('🔑 Auth check:', user ? `User found: ${user.email}` : 'No user', authError || '');
+
         if (user) {
-            const { error: orderError } = await supabase
+            const { data: orderData, error: orderError } = await supabase
                 .from('orders')
                 .insert({
                     client_id: user.id,
@@ -83,13 +85,14 @@ export async function POST(request) {
                     total_price: null,
                     status: 'pending',
                     paid: false,
-                });
+                })
+                .select();
 
             if (orderError) {
-                console.error('Order creation error:', orderError);
+                console.error('❌ Order creation error:', JSON.stringify(orderError));
             } else {
                 orderCreated = true;
-                console.log('📦 Commande créée pour', user.email);
+                console.log('📦 Commande créée pour', user.email, orderData);
             }
         }
 

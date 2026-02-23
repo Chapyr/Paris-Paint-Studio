@@ -27,6 +27,17 @@ CREATE OR REPLACE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
+-- Helper: Check admin role without triggering RLS (avoids infinite recursion)
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = auth.uid() AND role = 'admin'
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
+
 -- 2. Orders
 CREATE TABLE IF NOT EXISTS orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -71,37 +82,34 @@ CREATE POLICY "Users can update own profile"
   ON profiles FOR UPDATE
   USING (auth.uid() = id);
 
--- Profiles: admins can view all profiles
+-- Profiles: admins can view all profiles (uses is_admin() to avoid recursion)
 CREATE POLICY "Admins can view all profiles"
   ON profiles FOR SELECT
-  USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-  );
+  USING (public.is_admin());
 
 -- Orders: clients can view their own orders
 CREATE POLICY "Clients can view own orders"
   ON orders FOR SELECT
   USING (client_id = auth.uid());
 
+-- Orders: clients can create their own orders
+CREATE POLICY "Clients can insert own orders"
+  ON orders FOR INSERT
+  WITH CHECK (client_id = auth.uid());
+
 -- Orders: admins can do everything with orders
 CREATE POLICY "Admins can manage all orders"
   ON orders FOR ALL
-  USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-  );
+  USING (public.is_admin());
 
 -- Messages: only admins can view messages
 CREATE POLICY "Admins can view messages"
   ON messages FOR SELECT
-  USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-  );
+  USING (public.is_admin());
 
 CREATE POLICY "Admins can update messages"
   ON messages FOR UPDATE
-  USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-  );
+  USING (public.is_admin());
 
 -- Messages: anyone can insert (contact form)
 CREATE POLICY "Anyone can send messages"

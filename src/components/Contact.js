@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase';
 export default function Contact() {
     const [submitted, setSubmitted] = useState(false);
     const [submitMessage, setSubmitMessage] = useState('');
+    const [error, setError] = useState('');
     const [user, setUser] = useState(null);
 
     useEffect(() => {
@@ -31,6 +32,7 @@ export default function Contact() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
 
         // Force login before sending
         if (!user) {
@@ -50,8 +52,9 @@ export default function Contact() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
             });
+            const result = await res.json();
+
             if (res.ok) {
-                const result = await res.json();
                 setSubmitted(true);
                 e.target.reset();
                 sessionStorage.removeItem('pps-contact-draft');
@@ -64,12 +67,11 @@ export default function Contact() {
                     setSubmitMessage('✓ Message envoyé !');
                     setTimeout(() => setSubmitted(false), 2500);
                 }
+            } else {
+                setError(result.error || 'Une erreur est survenue.');
             }
         } catch {
-            setSubmitted(true);
-            setSubmitMessage('✓ Message envoyé !');
-            e.target.reset();
-            setTimeout(() => setSubmitted(false), 2500);
+            setError('Erreur de connexion. Réessayez.');
         }
     };
 
@@ -146,6 +148,11 @@ export default function Contact() {
                         <div className="form-group">
                             <textarea name="message" placeholder="Décrivez votre projet : nombre de figurines, niveau de finition souhaité, délai…" required></textarea>
                         </div>
+                        {error && (
+                            <div style={{ color: '#ff6b6b', fontSize: '0.85rem', marginBottom: '12px', padding: '8px 12px', border: '1px solid #ff6b6b33', background: '#ff6b6b11' }}>
+                                ⚠️ {error}
+                            </div>
+                        )}
                         <button type="submit" className="form-submit" disabled={submitted}>
                             {submitted ? submitMessage : 'Envoyer le message'}
                             {!submitted && (

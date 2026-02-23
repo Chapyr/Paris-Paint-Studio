@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paris Paint Studio — Peinture de Figurines Warhammer à Paris</title>
+  <meta name="description" content="Service professionnel de peinture sur figurines Warhammer à Paris. Peinture sur commande de haute qualité pour Warhammer 40K, Age of Sigmar et jeux de figurines.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+</head>
+<body>
+
+  <!-- ═══ NAVIGATION ═══ -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="#" class="nav-logo">Paris <span>Paint Studio</span></a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#services">Services</a></li>
+        <li><a href="#gallery">Galerie</a></li>
+        <li><a href="#about">À propos</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero" id="hero">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-badge">Artisan peintre · Paris</div>
+      <h1 class="hero-title">
+        L'art de la <span class="highlight">figurine</span> élevé au rang de chef-d'œuvre
+      </h1>
+      <p class="hero-description">
+        Peinture sur commande de figurines Warhammer. Chaque pièce est traitée avec le soin et la précision d'une œuvre unique, dans notre atelier parisien.
+      </p>
+      <a href="#contact" class="hero-cta">
+        Demander un devis
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+    <div class="hero-scroll-indicator">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ═══ SERVICES ═══ -->
+  <section id="services">
+    <div class="container">
+      <div class="reveal">
+        <h2 class="section-title">Nos Prestations</h2>
+        <span class="gold-line"></span>
+        <p class="section-subtitle">Trois niveaux de finition pour répondre à chaque ambition</p>
+      </div>
+      <div class="services-grid">
+
+        <!-- Standard -->
+        <div class="service-card reveal">
+          <div class="service-icon">⚔️</div>
+          <div class="service-tier">Niveau I</div>
+          <h3 class="service-name">Standard</h3>
+          <p class="service-description">Peinture propre et soignée, idéale pour les grandes armées de jeu. Couleurs vives, ombrages de base et socle texturé.</p>
+          <ul class="service-features">
+            <li>Base coating & shading</li>
+            <li>Highlighting principal</li>
+            <li>Socle texturé simple</li>
+            <li>Délai : 5-7 jours</li>
+          </ul>
+          <div class="service-price">À partir de 15€</div>
+          <span class="service-price-note">par figurine d'infanterie</span>
+        </div>
+
+        <!-- Premium -->
+        <div class="service-card featured reveal">
+          <div class="popular-badge">Populaire</div>
+          <div class="service-icon">🛡️</div>
+          <div class="service-tier">Niveau II</div>
+          <h3 class="service-name">Premium</h3>
+          <p class="service-description">Finition professionnelle avec techniques avancées. Parfait pour les pièces maîtresses et les personnages héroïques.</p>
+          <ul class="service-features">
+            <li>Blending & Wet blending</li>
+            <li>Éclairage non-métallique (NMM)</li>
+            <li>Effets de vieillissement</li>
+            <li>Socle décoré avec décors</li>
+            <li>Délai : 10-14 jours</li>
+          </ul>
+          <div class="service-price">À partir de 45€</div>
+          <span class="service-price-note">par figurine d'infanterie</span>
+        </div>
+
+        <!-- Compétition -->
+        <div class="service-card reveal">
+          <div class="service-icon">👑</div>
+          <div class="service-tier">Niveau III</div>
+          <h3 class="service-name">Compétition</h3>
+          <p class="service-description">Niveau exposition et concours. Chaque détail est travaillé à la perfection pour les collectionneurs les plus exigeants.</p>
+          <ul class="service-features">
+            <li>Techniques de studio avancées</li>
+            <li>Freehand & motifs personnalisés</li>
+            <li>OSL (Object Source Lighting)</li>
+            <li>Socle diorama sur mesure</li>
+            <li>Délai : 3-4 semaines</li>
+          </ul>
+          <div class="service-price">À partir de 120€</div>
+          <span class="service-price-note">par figurine d'infanterie</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ GALERIE ═══ -->
+  <section id="gallery">
+    <div class="container">
+      <div class="reveal">
+        <h2 class="section-title">Notre Galerie</h2>
+        <span class="gold-line"></span>
+        <p class="section-subtitle">Quelques réalisations récentes sorties de l'atelier</p>
+      </div>
+      <div class="gallery-grid">
+        <div class="gallery-item reveal" data-title="Ultramarines Intercessor" data-category="Warhammer 40K">
+          <img src="images/space-marine.png" alt="Space Marine Ultramarines peint à la main" loading="lazy">
+          <div class="gallery-overlay">
+            <div class="gallery-overlay-text">
+              <h4>Ultramarines Intercessor</h4>
+              <p>Warhammer 40K</p>
+            </div>
+          </div>
+        </div>
+        <div class="gallery-item reveal" data-title="Chevalier du Chaos" data-category="Age of Sigmar">
+          <img src="images/fantasy-knight.png" alt="Chevalier du Chaos peint avec techniques NMM" loading="lazy">
+          <div class="gallery-overlay">
+            <div class="gallery-overlay-text">
+              <h4>Chevalier du Chaos</h4>
+              <p>Age of Sigmar</p>
+            </div>
+          </div>
+        </div>
+        <div class="gallery-item reveal" data-title="Collection Complète" data-category="Commande sur mesure">
+          <img src="images/collection.png" alt="Collection complète de figurines Warhammer peintes" loading="lazy">
+          <div class="gallery-overlay">
+            <div class="gallery-overlay-text">
+              <h4>Collection Complète</h4>
+              <p>Commande sur mesure</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ À PROPOS ═══ -->
+  <section id="about">
+    <div class="container">
+      <div class="about-content">
+        <div class="about-image-wrapper reveal">
+          <img src="images/collection.png" alt="Atelier Paris Paint Studio" class="about-image">
+          <div class="about-image-frame"></div>
+        </div>
+        <div class="about-text reveal">
+          <h2 class="section-title" style="text-align: left; margin-bottom: 4px;">L'Atelier</h2>
+          <span class="gold-line" style="margin-left: 0;"></span>
+          <h3>La passion du détail, au cœur de Paris</h3>
+          <p>
+            Fondé par un passionné du hobby depuis plus de 10 ans, Paris Paint Studio est né de la conviction que chaque figurine mérite d'être traitée comme une œuvre d'art à part entière.
+          </p>
+          <p>
+            Installé dans le cœur de Paris, notre atelier combine techniques traditionnelles et approches modernes pour donner vie à vos armées et personnages. Du simple régiment au diorama d'exposition, nous apportons le même niveau d'exigence à chaque projet.
+          </p>
+          <div class="about-stats">
+            <div class="stat-item">
+              <span class="stat-number">500+</span>
+              <span class="stat-label">Figurines peintes</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">10</span>
+              <span class="stat-label">Ans d'expérience</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">98%</span>
+              <span class="stat-label">Clients satisfaits</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CONTACT ═══ -->
+  <section id="contact">
+    <div class="container">
+      <div class="reveal">
+        <h2 class="section-title">Contactez-nous</h2>
+        <span class="gold-line"></span>
+        <p class="section-subtitle">Discutons de votre prochain projet</p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-info reveal">
+          <h3>Parlons de votre projet</h3>
+          <p>Que vous ayez un seul personnage héroïque ou une armée entière à peindre, nous serons ravis d'en discuter. Envoyez-nous un message et nous vous répondrons sous 24h.</p>
+          <div class="contact-detail">
+            <div class="contact-detail-icon">📍</div>
+            <div class="contact-detail-text">
+              <strong>Adresse</strong>
+              <span>Paris, France</span>
+            </div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-detail-icon">✉️</div>
+            <div class="contact-detail-text">
+              <strong>Email</strong>
+              <span>contact@parispaintstudio.fr</span>
+            </div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-detail-icon">⏰</div>
+            <div class="contact-detail-text">
+              <strong>Horaires</strong>
+              <span>Lun – Ven, 10h – 19h</span>
+            </div>
+          </div>
+        </div>
+        <form class="contact-form reveal" id="contactForm">
+          <div class="form-group">
+            <input type="text" id="name" name="name" placeholder="Votre nom" required>
+          </div>
+          <div class="form-group">
+            <input type="email" id="email" name="email" placeholder="Votre email" required>
+          </div>
+          <div class="form-group">
+            <input type="text" id="subject" name="subject" placeholder="Sujet (ex: Devis armée Space Marines)">
+          </div>
+          <div class="form-group">
+            <textarea id="message" name="message" placeholder="Décrivez votre projet : nombre de figurines, niveau de finition souhaité, délai…" required></textarea>
+          </div>
+          <button type="submit" class="form-submit">
+            Envoyer le message
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">Paris <span>Paint Studio</span></div>
+        <p class="footer-text">© 2026 Paris Paint Studio · Tous droits réservés</p>
+        <div class="footer-social">
+          <a href="#" aria-label="Instagram" title="Instagram">📷</a>
+          <a href="#" aria-label="Facebook" title="Facebook">📘</a>
+          <a href="#" aria-label="Discord" title="Discord">💬</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══ LIGHTBOX ═══ -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose" aria-label="Fermer">✕</button>
+    <img src="" alt="" id="lightboxImg">
+    <div class="lightbox-caption">
+      <h3 id="lightboxTitle"></h3>
+      <p id="lightboxCategory"></p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

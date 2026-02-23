@@ -79,7 +79,7 @@ export default function AdminClient({ orders, clients, messages }) {
                         </p>
                     </div>
                     <div className="dashboard-header-actions">
-                        <Link href="/" className="btn btn-outline">Retour au site</Link>
+                        <a href="/" className="btn btn-outline">Retour au site</a>
                         <button onClick={handleLogout} className="btn btn-danger">Déconnexion</button>
                     </div>
                 </div>

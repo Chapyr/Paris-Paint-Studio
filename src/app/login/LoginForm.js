@@ -47,9 +47,12 @@ export default function LoginForm() {
                 router.refresh();
             }
         } catch (err) {
-            setError(err.message === 'Invalid login credentials'
-                ? 'Email ou mot de passe incorrect.'
-                : err.message
+            setError(
+                err.message === 'Invalid login credentials'
+                    ? 'Email ou mot de passe incorrect.'
+                    : err.message === 'User already registered'
+                        ? 'Un compte existe déjà avec cet email. Connectez-vous.'
+                        : err.message
             );
         } finally {
             setLoading(false);
@@ -59,9 +62,9 @@ export default function LoginForm() {
     return (
         <div className="login-page">
             <div className="login-card">
-                <Link href="/" className="login-logo">
+                <a href="/" className="login-logo">
                     Paris <span>Paint Studio</span>
-                </Link>
+                </a>
                 <h1 className="login-title">
                     {isSignUp ? 'Créer un compte' : 'Connexion'}
                 </h1>

@@ -69,8 +69,32 @@ export async function POST(request) {
             console.log('📩 Fallback — Nouveau message:', { name, email, subject, message });
         }
 
+        // ── Auto-create order if user is authenticated ──
+        let orderCreated = false;
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            const { error: orderError } = await supabase
+                .from('orders')
+                .insert({
+                    client_id: user.id,
+                    tier: 'standard',
+                    description: `${subject || 'Demande de devis'} — ${message}`.slice(0, 500),
+                    figurine_count: 1,
+                    total_price: null,
+                    status: 'pending',
+                    paid: false,
+                });
+
+            if (orderError) {
+                console.error('Order creation error:', orderError);
+            } else {
+                orderCreated = true;
+                console.log('📦 Commande créée pour', user.email);
+            }
+        }
+
         const response = NextResponse.json(
-            { success: true, message: 'Message reçu !' }
+            { success: true, message: 'Message reçu !', orderCreated }
         );
         response.headers.set('X-RateLimit-Remaining', String(remaining));
         return response;

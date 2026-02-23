@@ -5,14 +5,14 @@ export default function Footer() {
         <footer className="footer">
             <div className="container">
                 <div className="footer-content">
-                    <Link href="/" className="footer-logo">
+                    <a href="/" className="footer-logo">
                         Paris <span>Paint Studio</span>
-                    </Link>
+                    </a>
                     <p className="footer-text">
                         © 2026 Paris Paint Studio · Tous droits réservés ·{' '}
-                        <Link href="/mentions-legales" style={{ color: 'var(--color-text-muted)' }}>
+                        <a href="/mentions-legales" style={{ color: 'var(--color-text-muted)' }}>
                             Mentions légales
-                        </Link>
+                        </a>
                     </p>
                     <div className="footer-social">
                         <a href="#" aria-label="Instagram" title="Instagram">📷</a>

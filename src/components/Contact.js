@@ -1,12 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { createClient } from '@/lib/supabase';
 
 export default function Contact() {
     const [submitted, setSubmitted] = useState(false);
+    const [submitMessage, setSubmitMessage] = useState('');
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const supabase = createClient();
+        supabase.auth.getUser().then(({ data: { user } }) => setUser(user));
+
+        // Restore saved form data after login redirect
+        const saved = sessionStorage.getItem('pps-contact-draft');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                const form = document.querySelector('.contact-form');
+                if (form) {
+                    if (data.name) form.querySelector('[name="name"]').value = data.name;
+                    if (data.email) form.querySelector('[name="email"]').value = data.email;
+                    if (data.subject) form.querySelector('[name="subject"]').value = data.subject;
+                    if (data.message) form.querySelector('[name="message"]').value = data.message;
+                }
+            } catch { }
+        }
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Force login before sending
+        if (!user) {
+            const formData = new FormData(e.target);
+            const draft = Object.fromEntries(formData);
+            sessionStorage.setItem('pps-contact-draft', JSON.stringify(draft));
+            window.location.href = '/login?redirect=/#contact';
+            return;
+        }
+
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData);
 
@@ -17,13 +51,23 @@ export default function Contact() {
                 body: JSON.stringify(data),
             });
             if (res.ok) {
+                const result = await res.json();
                 setSubmitted(true);
                 e.target.reset();
-                setTimeout(() => setSubmitted(false), 2500);
+                sessionStorage.removeItem('pps-contact-draft');
+                if (result.orderCreated) {
+                    setSubmitMessage('✓ Devis envoyé ! Commande créée dans votre espace.');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 2000);
+                } else {
+                    setSubmitMessage('✓ Message envoyé !');
+                    setTimeout(() => setSubmitted(false), 2500);
+                }
             }
         } catch {
-            // Fallback: just show success for now (no backend yet)
             setSubmitted(true);
+            setSubmitMessage('✓ Message envoyé !');
             e.target.reset();
             setTimeout(() => setSubmitted(false), 2500);
         }
@@ -66,6 +110,28 @@ export default function Contact() {
                                 <span>Lun – Ven, 10h – 19h</span>
                             </div>
                         </div>
+
+                        {!user && (
+                            <div style={{ marginTop: '24px', padding: '16px', border: '1px solid var(--color-border)', background: 'var(--color-glass)' }}>
+                                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '8px' }}>
+                                    🔐 Créez un compte pour suivre vos commandes
+                                </p>
+                                <a href="/login" className="btn btn-primary" style={{ padding: '8px 20px', fontSize: '0.7rem' }}>
+                                    Se connecter / Créer un compte
+                                </a>
+                            </div>
+                        )}
+
+                        {user && (
+                            <div style={{ marginTop: '24px', padding: '16px', border: '1px solid var(--color-border)', background: 'var(--color-glass)' }}>
+                                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '8px' }}>
+                                    ✅ Connecté — suivez vos commandes depuis votre espace
+                                </p>
+                                <a href="/dashboard" className="btn btn-primary" style={{ padding: '8px 20px', fontSize: '0.7rem' }}>
+                                    Mon Espace
+                                </a>
+                            </div>
+                        )}
                     </div>
                     <form className="contact-form reveal" onSubmit={handleSubmit}>
                         <div className="form-group">
@@ -81,7 +147,7 @@ export default function Contact() {
                             <textarea name="message" placeholder="Décrivez votre projet : nombre de figurines, niveau de finition souhaité, délai…" required></textarea>
                         </div>
                         <button type="submit" className="form-submit" disabled={submitted}>
-                            {submitted ? '✓ Message envoyé !' : 'Envoyer le message'}
+                            {submitted ? submitMessage : 'Envoyer le message'}
                             {!submitted && (
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M5 12h14" />
@@ -95,3 +161,4 @@ export default function Contact() {
         </section>
     );
 }
+

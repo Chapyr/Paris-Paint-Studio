@@ -30,8 +30,7 @@ export default function DashboardClient({ user, profile, orders }) {
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
-        router.push('/');
-        router.refresh();
+        window.location.href = '/';
     };
 
     const handlePay = async (orderId) => {
@@ -68,13 +67,13 @@ export default function DashboardClient({ user, profile, orders }) {
             <div className="container">
                 <div className="dashboard-header">
                     <div>
-                        <h1>Bonjour, {profile?.full_name || user.email} 👋</h1>
+                        <h1>Bonjour, {profile?.full_name || user.user_metadata?.full_name || user.email} 👋</h1>
                         <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
                             Bienvenue dans votre espace client
                         </p>
                     </div>
                     <div className="dashboard-header-actions">
-                        <Link href="/" className="btn btn-outline">Retour au site</Link>
+                        <a href="/" className="btn btn-outline">Retour au site</a>
                         <button onClick={handleLogout} className="btn btn-danger">
                             Déconnexion
                         </button>
@@ -122,9 +121,9 @@ export default function DashboardClient({ user, profile, orders }) {
                         <div className="empty-state-icon">📦</div>
                         <h3>Aucune commande</h3>
                         <p>Vous n&apos;avez pas encore de commande. Contactez-nous pour votre premier projet !</p>
-                        <Link href="/#contact" className="btn btn-primary" style={{ marginTop: '16px' }}>
+                        <a href="/#contact" className="btn btn-primary" style={{ marginTop: '16px' }}>
                             Demander un devis
-                        </Link>
+                        </a>
                     </div>
                 ) : (
                     <div className="orders-table-wrapper">
@@ -166,7 +165,9 @@ export default function DashboardClient({ user, profile, orders }) {
                                                     {payingOrderId === order.id ? 'Redirection...' : 'Payer'}
                                                 </button>
                                             ) : (
-                                                <span className="unpaid-badge">En attente de devis</span>
+                                                <span style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>
+                                                    ⏳ En attente de devis
+                                                </span>
                                             )}
                                         </td>
                                     </tr>

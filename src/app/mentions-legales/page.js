@@ -11,7 +11,7 @@ export default function MentionsLegales() {
             <div className="container">
                 <div className="legal-content">
 
-                    <Link href="/" className="legal-back">← Retour au site</Link>
+                    <a href="/" className="legal-back">← Retour au site</a>
 
                     <h1 className="legal-title">Mentions Légales</h1>
                     <span className="gold-line" style={{ marginLeft: 0 }}></span>

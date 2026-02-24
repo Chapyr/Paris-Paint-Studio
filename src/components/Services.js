@@ -1,34 +1,32 @@
 export default function Services() {
     const tiers = [
         {
-            icon: '⚔️',
-            level: 'Niveau I',
+            icon: '🎨',
             name: 'Standard',
-            description: 'Peinture propre et soignée, idéale pour les grandes armées de jeu. Couleurs vives, ombrages de base et socle texturé.',
-            features: ['Base coating & shading', 'Highlighting principal', 'Socle texturé simple', 'Délai : 5-7 jours'],
-            price: 'À partir de 15€',
-            note: 'par figurine d\'infanterie',
-            featured: false,
+            description: 'Peinture propre et soignée pour vos armées de jeu. Couleurs vives, ombrages de base et socle texturé.',
+            highlights: ['Base coating & shading', 'Socle texturé', 'Idéal pour les armées'],
+            cta: { label: 'Demander un devis', href: '/#contact' },
         },
         {
-            icon: '🛡️',
-            level: 'Niveau II',
-            name: 'Premium',
-            description: 'Finition professionnelle avec techniques avancées. Parfait pour les pièces maîtresses et les personnages héroïques.',
-            features: ['Blending & Wet blending', 'Éclairage non-métallique (NMM)', 'Effets de vieillissement', 'Socle décoré avec décors', 'Délai : 10-14 jours'],
-            price: 'À partir de 45€',
-            note: 'par figurine d\'infanterie',
-            featured: true,
+            icon: '🔍',
+            name: 'Détaillé',
+            description: 'Finition professionnelle avec techniques avancées. Blending, NMM et weathering pour vos pièces maîtresses.',
+            highlights: ['Blending & NMM', 'Effets de vieillissement', 'Socle décoré'],
+            cta: { label: 'Demander un devis', href: '/#contact' },
+        },
+        {
+            icon: '🖌️',
+            name: 'Style Spécifique',
+            description: 'Choisissez un style de peinture dans notre galerie et nous reproduisons ce rendu sur vos figurines.',
+            highlights: ['Styles variés', 'Rendu garanti', 'Selon la galerie'],
+            cta: { label: 'Voir la galerie', href: '/#gallery' },
         },
         {
             icon: '👑',
-            level: 'Niveau III',
-            name: 'Compétition',
-            description: 'Niveau exposition et concours. Chaque détail est travaillé à la perfection pour les collectionneurs les plus exigeants.',
-            features: ['Techniques de studio avancées', 'Freehand & motifs personnalisés', 'OSL (Object Source Lighting)', 'Socle diorama sur mesure', 'Délai : 3-4 semaines'],
-            price: 'À partir de 120€',
-            note: 'par figurine d\'infanterie',
-            featured: false,
+            name: 'Sur Mesure',
+            description: 'Un projet unique ? Contactez-nous pour une prestation entièrement personnalisée selon vos envies.',
+            highlights: ['100% personnalisé', 'Diorama & display', 'Devis sur mesure'],
+            cta: { label: 'Nous contacter', href: '/#contact' },
         },
     ];
 
@@ -38,23 +36,26 @@ export default function Services() {
                 <div className="reveal">
                     <h2 className="section-title">Nos Prestations</h2>
                     <span className="gold-line"></span>
-                    <p className="section-subtitle">Trois niveaux de finition pour répondre à chaque ambition</p>
+                    <p className="section-subtitle">Quatre formules pour répondre à chaque ambition</p>
                 </div>
                 <div className="services-grid">
                     {tiers.map((tier) => (
-                        <div key={tier.name} className={`service-card reveal${tier.featured ? ' featured' : ''}`}>
-                            {tier.featured && <div className="popular-badge">Populaire</div>}
+                        <div key={tier.name} className="service-card reveal">
                             <div className="service-icon">{tier.icon}</div>
-                            <div className="service-tier">{tier.level}</div>
                             <h3 className="service-name">{tier.name}</h3>
                             <p className="service-description">{tier.description}</p>
                             <ul className="service-features">
-                                {tier.features.map((f) => (
-                                    <li key={f}>{f}</li>
+                                {tier.highlights.map((h) => (
+                                    <li key={h}>{h}</li>
                                 ))}
                             </ul>
-                            <div className="service-price">{tier.price}</div>
-                            <span className="service-price-note">{tier.note}</span>
+                            <a href={tier.cta.href} className="service-cta">
+                                {tier.cta.label}
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M5 12h14" />
+                                    <path d="m12 5 7 7-7 7" />
+                                </svg>
+                            </a>
                         </div>
                     ))}
                 </div>

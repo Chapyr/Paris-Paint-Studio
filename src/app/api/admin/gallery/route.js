@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase-server';
+import { sanitizeText } from '@/lib/security';
 
 // GET: fetch all gallery styles (public)
 export async function GET() {
@@ -35,7 +36,12 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-    const { category, title, description, image_url } = body;
+
+    // Sanitize inputs
+    const category = body.category?.trim();
+    const title = sanitizeText(body.title, 200);
+    const description = sanitizeText(body.description, 2000);
+    const image_url = body.image_url?.trim()?.slice(0, 500);
 
     if (!category || !title || !description || !image_url) {
         return NextResponse.json({ error: 'Tous les champs sont requis' }, { status: 400 });
@@ -44,6 +50,11 @@ export async function POST(request) {
     const validCategories = ['empire', 'heretique', 'alien', 'universel'];
     if (!validCategories.includes(category)) {
         return NextResponse.json({ error: 'Catégorie invalide' }, { status: 400 });
+    }
+
+    // Validate image_url format
+    if (!image_url.startsWith('/') && !image_url.startsWith('https://')) {
+        return NextResponse.json({ error: 'URL image invalide (doit commencer par / ou https://)' }, { status: 400 });
     }
 
     const { data, error } = await supabase

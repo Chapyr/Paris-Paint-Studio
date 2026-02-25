@@ -2,14 +2,15 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendPriceQuoteEmail } from '@/lib/email';
 
-// Service role client to fetch user email
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
-
 export async function POST(request) {
     try {
+        // ── Verify webhook secret ──
+        const webhookSecret = request.headers.get('x-webhook-secret');
+        if (!process.env.SUPABASE_WEBHOOK_SECRET || webhookSecret !== process.env.SUPABASE_WEBHOOK_SECRET) {
+            console.error('❌ Webhook: invalid or missing secret');
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const body = await request.json();
 
         // Supabase Database Webhook sends: { type, table, record, old_record }
@@ -25,6 +26,17 @@ export async function POST(request) {
         if (!priceChanged || !record.client_id) {
             return NextResponse.json({ ignored: true });
         }
+
+        // Service role client to fetch user email
+        if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+            console.error('❌ Missing SUPABASE_SERVICE_ROLE_KEY');
+            return NextResponse.json({ error: 'Server config error' }, { status: 500 });
+        }
+
+        const supabaseAdmin = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
 
         // Get client email from auth
         const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(record.client_id);

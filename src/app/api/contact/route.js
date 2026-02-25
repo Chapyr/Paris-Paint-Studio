@@ -66,14 +66,12 @@ export async function POST(request) {
             .insert({ name, email, subject, message });
 
         if (error) {
-            console.error('Supabase error:', error);
-            console.log('📩 Fallback — Nouveau message:', { name, email, subject, message });
+            console.error('Supabase error:', error.message);
         }
 
         // ── Auto-create order if user is authenticated ──
         let orderCreated = false;
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        console.log('🔑 Auth check:', user ? `User found: ${user.email}` : 'No user', authError || '');
+        const { data: { user } } = await supabase.auth.getUser();
 
         if (user) {
             const { data: orderData, error: orderError } = await supabase
@@ -90,10 +88,9 @@ export async function POST(request) {
                 .select();
 
             if (orderError) {
-                console.error('❌ Order creation error:', JSON.stringify(orderError));
+                console.error('Order creation error:', orderError.message);
             } else {
                 orderCreated = true;
-                console.log('📦 Commande créée pour', user.email, orderData);
 
                 // Send confirmation email (async, don't block response)
                 sendQuoteConfirmation({

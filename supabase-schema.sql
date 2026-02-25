@@ -115,3 +115,28 @@ CREATE POLICY "Admins can update messages"
 CREATE POLICY "Anyone can send messages"
   ON messages FOR INSERT
   WITH CHECK (true);
+
+-- ============================================
+-- 5. Gallery Styles (dynamic gallery entries)
+-- ============================================
+CREATE TABLE IF NOT EXISTS gallery_styles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  category TEXT NOT NULL CHECK (category IN ('empire', 'heretique', 'alien', 'universel')),
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  image_url TEXT NOT NULL,
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE gallery_styles ENABLE ROW LEVEL SECURITY;
+
+-- Public can read gallery styles
+CREATE POLICY "Anyone can view gallery styles"
+  ON gallery_styles FOR SELECT
+  USING (true);
+
+-- Admins can manage gallery styles
+CREATE POLICY "Admins can manage gallery styles"
+  ON gallery_styles FOR ALL
+  USING (public.is_admin());

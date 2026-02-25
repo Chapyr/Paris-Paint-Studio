@@ -8,6 +8,7 @@ export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [user, setUser] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -19,13 +20,30 @@ export default function Navbar() {
 
     useEffect(() => {
         const supabase = createClient();
+
+        const checkUser = async (currentUser) => {
+            if (currentUser) {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', currentUser.id)
+                    .single();
+                setIsAdmin(profile?.role === 'admin');
+            } else {
+                setIsAdmin(false);
+            }
+        };
+
         supabase.auth.getUser().then(({ data: { user } }) => {
             setUser(user);
+            checkUser(user);
             setLoading(false);
         });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
+            const u = session?.user ?? null;
+            setUser(u);
+            checkUser(u);
         });
 
         return () => subscription.unsubscribe();
@@ -44,6 +62,13 @@ export default function Navbar() {
                     <li><a href="/#gallery" onClick={closeMenu}>Galerie</a></li>
                     <li><a href="/#about" onClick={closeMenu}>À propos</a></li>
                     <li><a href="/#contact" onClick={closeMenu}>Contact</a></li>
+                    {!loading && user && isAdmin && (
+                        <li>
+                            <a href="/admin" onClick={closeMenu} className="nav-auth-link" style={{ color: 'var(--color-gold)' }}>
+                                Admin 🛡️
+                            </a>
+                        </li>
+                    )}
                     {!loading && (
                         <li>
                             {user ? (

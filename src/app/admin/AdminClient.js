@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import '../../app/dashboard.css';
 
 const STATUS_LABELS = {
@@ -20,10 +19,23 @@ const TIER_LABELS = {
     competition: 'Compétition',
 };
 
-export default function AdminClient({ orders, clients, messages }) {
+const CATEGORY_LABELS = {
+    empire: 'Empire',
+    heretique: 'Hérétique',
+    alien: 'Alien',
+    universel: 'Universel',
+};
+
+export default function AdminClient({ orders, clients, messages, galleryStyles }) {
     const [activeTab, setActiveTab] = useState('orders');
     const [localOrders, setLocalOrders] = useState(orders);
     const [localMessages, setLocalMessages] = useState(messages);
+    const [localGallery, setLocalGallery] = useState(galleryStyles);
+    const [showGalleryForm, setShowGalleryForm] = useState(false);
+    const [galleryForm, setGalleryForm] = useState({
+        category: 'empire', title: '', description: '', image_url: '',
+    });
+    const [galleryLoading, setGalleryLoading] = useState(false);
     const router = useRouter();
     const supabase = createClient();
 
@@ -67,6 +79,46 @@ export default function AdminClient({ orders, clients, messages }) {
         }
     };
 
+    const handleAddGalleryStyle = async (e) => {
+        e.preventDefault();
+        setGalleryLoading(true);
+
+        try {
+            const res = await fetch('/api/admin/gallery', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(galleryForm),
+            });
+
+            if (res.ok) {
+                const newStyle = await res.json();
+                setLocalGallery(prev => [newStyle, ...prev]);
+                setGalleryForm({ category: 'empire', title: '', description: '', image_url: '' });
+                setShowGalleryForm(false);
+            } else {
+                const err = await res.json();
+                alert('Erreur : ' + (err.error || 'Impossible d\'ajouter'));
+            }
+        } catch {
+            alert('Erreur de connexion');
+        } finally {
+            setGalleryLoading(false);
+        }
+    };
+
+    const handleDeleteGalleryStyle = async (id) => {
+        if (!confirm('Supprimer cet encart ?')) return;
+
+        try {
+            const res = await fetch(`/api/admin/gallery?id=${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                setLocalGallery(prev => prev.filter(s => s.id !== id));
+            }
+        } catch {
+            alert('Erreur lors de la suppression');
+        }
+    };
+
     const formatDate = (dateStr) => {
         return new Date(dateStr).toLocaleDateString('fr-FR', {
             day: 'numeric', month: 'short', year: 'numeric',
@@ -83,7 +135,7 @@ export default function AdminClient({ orders, clients, messages }) {
                     <div>
                         <h1>Administration 🛡️</h1>
                         <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
-                            Gérez vos commandes, clients et messages
+                            Gérez vos commandes, clients, messages et galerie
                         </p>
                     </div>
                     <div className="dashboard-header-actions">
@@ -95,7 +147,7 @@ export default function AdminClient({ orders, clients, messages }) {
                 {/* Stats */}
                 <div className="stats-grid">
                     <div className="stat-card">
-                        <div className="stat-card-label">Commandes totales</div>
+                        <div className="stat-card-label">Commandes</div>
                         <div className="stat-card-value">{localOrders.length}</div>
                     </div>
                     <div className="stat-card">
@@ -109,34 +161,28 @@ export default function AdminClient({ orders, clients, messages }) {
                         <div className="stat-card-value">{clients.length}</div>
                     </div>
                     <div className="stat-card">
-                        <div className="stat-card-label">Messages non lus</div>
-                        <div className="stat-card-value">{unreadCount}</div>
+                        <div className="stat-card-label">Galerie</div>
+                        <div className="stat-card-value">{localGallery.length}</div>
                     </div>
                 </div>
 
                 {/* Tabs */}
                 <nav className="admin-nav">
-                    <a
-                        href="#"
-                        className={activeTab === 'orders' ? 'active' : ''}
-                        onClick={(e) => { e.preventDefault(); setActiveTab('orders'); }}
-                    >
-                        Commandes ({localOrders.length})
-                    </a>
-                    <a
-                        href="#"
-                        className={activeTab === 'clients' ? 'active' : ''}
-                        onClick={(e) => { e.preventDefault(); setActiveTab('clients'); }}
-                    >
-                        Clients ({clients.length})
-                    </a>
-                    <a
-                        href="#"
-                        className={activeTab === 'messages' ? 'active' : ''}
-                        onClick={(e) => { e.preventDefault(); setActiveTab('messages'); }}
-                    >
-                        Messages ({unreadCount} non lu{unreadCount > 1 ? 's' : ''})
-                    </a>
+                    {[
+                        { key: 'orders', label: `Commandes (${localOrders.length})` },
+                        { key: 'clients', label: `Clients (${clients.length})` },
+                        { key: 'messages', label: `Messages (${unreadCount} non lu${unreadCount > 1 ? 's' : ''})` },
+                        { key: 'gallery', label: `Galerie (${localGallery.length})` },
+                    ].map(tab => (
+                        <a
+                            key={tab.key}
+                            href="#"
+                            className={activeTab === tab.key ? 'active' : ''}
+                            onClick={(e) => { e.preventDefault(); setActiveTab(tab.key); }}
+                        >
+                            {tab.label}
+                        </a>
+                    ))}
                 </nav>
 
                 {/* ── ORDERS TAB ── */}
@@ -278,6 +324,153 @@ export default function AdminClient({ orders, clients, messages }) {
                             ))}
                         </div>
                     )
+                )}
+
+                {/* ── GALLERY TAB ── */}
+                {activeTab === 'gallery' && (
+                    <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                            <h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-cream)', fontSize: '1.2rem' }}>
+                                Encarts de la galerie
+                            </h2>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => setShowGalleryForm(!showGalleryForm)}
+                            >
+                                {showGalleryForm ? '✕ Annuler' : '+ Ajouter un encart'}
+                            </button>
+                        </div>
+
+                        {/* Add Form */}
+                        {showGalleryForm && (
+                            <form onSubmit={handleAddGalleryStyle} style={{
+                                background: 'var(--color-bg-card)',
+                                border: '1px solid var(--color-border)',
+                                padding: '24px',
+                                marginBottom: '24px',
+                            }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                                    <div>
+                                        <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '6px' }}>
+                                            Catégorie
+                                        </label>
+                                        <select
+                                            value={galleryForm.category}
+                                            onChange={e => setGalleryForm(f => ({ ...f, category: e.target.value }))}
+                                            className="form-input"
+                                            style={{ width: '100%', padding: '10px 12px', background: 'var(--color-bg-deep)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
+                                        >
+                                            {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
+                                                <option key={key} value={key}>{label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '6px' }}>
+                                            Titre
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={galleryForm.title}
+                                            onChange={e => setGalleryForm(f => ({ ...f, title: e.target.value }))}
+                                            placeholder="Ex: Ultramarines — Tabletop+"
+                                            required
+                                            style={{ width: '100%', padding: '10px 12px', background: 'var(--color-bg-deep)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
+                                        />
+                                    </div>
+                                </div>
+                                <div style={{ marginBottom: '16px' }}>
+                                    <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '6px' }}>
+                                        URL de l&apos;image
+                                    </label>
+                                    <input
+                                        type="url"
+                                        value={galleryForm.image_url}
+                                        onChange={e => setGalleryForm(f => ({ ...f, image_url: e.target.value }))}
+                                        placeholder="https://... ou /images/nom.png"
+                                        required
+                                        style={{ width: '100%', padding: '10px 12px', background: 'var(--color-bg-deep)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
+                                    />
+                                    <p style={{ color: 'var(--color-text-muted)', fontSize: '0.7rem', marginTop: '4px' }}>
+                                        Utilisez une URL publique ou un chemin vers /images/
+                                    </p>
+                                </div>
+                                <div style={{ marginBottom: '16px' }}>
+                                    <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '6px' }}>
+                                        Description
+                                    </label>
+                                    <textarea
+                                        value={galleryForm.description}
+                                        onChange={e => setGalleryForm(f => ({ ...f, description: e.target.value }))}
+                                        placeholder="Description détaillée du style de peinture..."
+                                        required
+                                        rows={3}
+                                        style={{ width: '100%', padding: '10px 12px', background: 'var(--color-bg-deep)', border: '1px solid var(--color-border)', color: 'var(--color-text)', resize: 'vertical' }}
+                                    />
+                                </div>
+                                <button type="submit" className="btn btn-primary" disabled={galleryLoading}>
+                                    {galleryLoading ? 'Ajout en cours...' : '✓ Ajouter l\'encart'}
+                                </button>
+                            </form>
+                        )}
+
+                        {/* Gallery list by category */}
+                        {Object.entries(CATEGORY_LABELS).map(([catKey, catLabel]) => {
+                            const catStyles = localGallery.filter(s => s.category === catKey);
+                            return (
+                                <div key={catKey} style={{ marginBottom: '32px' }}>
+                                    <h3 style={{
+                                        fontFamily: 'var(--font-heading)',
+                                        color: 'var(--color-gold)',
+                                        fontSize: '1rem',
+                                        marginBottom: '12px',
+                                        letterSpacing: '1px',
+                                    }}>
+                                        {catLabel} ({catStyles.length})
+                                    </h3>
+                                    {catStyles.length === 0 ? (
+                                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', fontStyle: 'italic' }}>
+                                            Aucun encart dans cette catégorie
+                                        </p>
+                                    ) : (
+                                        <div style={{ display: 'grid', gap: '12px' }}>
+                                            {catStyles.map(style => (
+                                                <div key={style.id} style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '16px',
+                                                    background: 'var(--color-bg-card)',
+                                                    border: '1px solid var(--color-border)',
+                                                    padding: '12px 16px',
+                                                }}>
+                                                    <img
+                                                        src={style.image_url}
+                                                        alt={style.title}
+                                                        style={{ width: '80px', height: '60px', objectFit: 'cover', border: '1px solid var(--color-border)' }}
+                                                    />
+                                                    <div style={{ flex: 1 }}>
+                                                        <div style={{ color: 'var(--color-cream)', fontFamily: 'var(--font-heading)', fontSize: '0.9rem' }}>
+                                                            {style.title}
+                                                        </div>
+                                                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', marginTop: '2px' }}>
+                                                            {style.description.slice(0, 80)}...
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => handleDeleteGalleryStyle(style.id)}
+                                                        className="btn btn-danger"
+                                                        style={{ padding: '6px 12px', fontSize: '0.7rem' }}
+                                                    >
+                                                        Supprimer
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
                 )}
             </div>
         </div>

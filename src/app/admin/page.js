@@ -39,11 +39,25 @@ export default async function AdminPage() {
         .select('*')
         .order('created_at', { ascending: false });
 
+    // Fetch gallery styles (graceful if table doesn't exist yet)
+    let galleryStyles = [];
+    try {
+        const { data } = await supabase
+            .from('gallery_styles')
+            .select('*')
+            .order('sort_order', { ascending: true })
+            .order('created_at', { ascending: false });
+        galleryStyles = data || [];
+    } catch {
+        galleryStyles = [];
+    }
+
     return (
         <AdminClient
             orders={orders || []}
             clients={clients || []}
             messages={messages || []}
+            galleryStyles={galleryStyles || []}
         />
     );
 }
